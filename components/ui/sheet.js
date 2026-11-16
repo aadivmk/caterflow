@@ -1,0 +1,39 @@
+"use client";
+
+import { X } from "lucide-react";
+import { Dialog as SheetPrimitive } from "radix-ui";
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+const Sheet = SheetPrimitive.Root;
+const SheetTrigger = SheetPrimitive.Trigger;
+const SheetClose = SheetPrimitive.Close;
+
+function SheetContent({ className, children, side = "left", ...props }) {
+  return (
+    <SheetPrimitive.Portal>
+      <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-stone-900/40 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+      <SheetPrimitive.Content
+        className={cn(
+          "fixed inset-y-0 z-50 flex w-[85vw] max-w-sm flex-col overflow-y-auto bg-card shadow-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:duration-200",
+          side === "left"
+            ? "left-0 border-r data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left"
+            : "right-0 border-l data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        <SheetPrimitive.Close className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground">
+          <X className="size-4" />
+          <span className="sr-only">Close</span>
+        </SheetPrimitive.Close>
+      </SheetPrimitive.Content>
+    </SheetPrimitive.Portal>
+  );
+}
+
+const SheetTitle = SheetPrimitive.Title;
+const SheetDescription = SheetPrimitive.Description;
+
+export { Sheet, SheetTrigger, SheetClose, SheetContent, SheetTitle, SheetDescription };

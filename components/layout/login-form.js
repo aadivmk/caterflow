@@ -10,6 +10,7 @@ import { z } from "zod";
 import { Field } from "@/components/shared/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { apiUrl } from "@/lib/api-url";
 import { setSession } from "@/lib/mongodb/session";
 import { errorMessage } from "@/lib/utils";
 import { emailAddress } from "@/lib/validations/common";
@@ -35,7 +36,7 @@ export function LoginForm() {
   async function onSubmit(values) {
     try {
       const response = await fetch(
-        mode === "signin" ? "/api/auth/login" : "/api/auth/register",
+        apiUrl(mode === "signin" ? "/api/auth/login" : "/api/auth/register"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { apiUrl } from "@/lib/api-url";
 import { getSession } from "@/lib/mongodb/session";
 import { errorMessage } from "@/lib/utils";
 
@@ -44,7 +45,7 @@ function AccountInfoCard({ profile }) {
   async function onSubmit(values) {
     try {
       const session = getSession();
-      const res = await fetch("/api/auth/profile", {
+      const res = await fetch(apiUrl("/api/auth/profile"), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -149,7 +150,7 @@ function ChangePasswordCard() {
   async function onSubmit(values) {
     try {
       const session = getSession();
-      const res = await fetch("/api/auth/profile", {
+      const res = await fetch(apiUrl("/api/auth/profile"), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -251,7 +252,7 @@ export function ProfileForm() {
       try {
         const session = getSession();
         if (!session) return;
-        const res = await fetch("/api/auth/profile", {
+        const res = await fetch(apiUrl("/api/auth/profile"), {
           headers: { Authorization: `Bearer ${session.token}` },
         });
         const body = await res.json().catch(() => ({}));

@@ -1,12 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { History, Mail, Pencil, Phone, Search, UserPlus, Users } from "lucide-react";
+import { History, Mail, Pencil, Phone, Search, Trash2, UserPlus, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { DemoTag, StatusBadge } from "@/components/shared/badges";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DataBoundary } from "@/components/shared/data-boundary";
 import { Field } from "@/components/shared/field";
 import { EmptyState } from "@/components/shared/states";
@@ -126,7 +127,7 @@ function CustomerDialog({ open, onOpenChange, customer }) {
 }
 
 function Customers() {
-  const { customers } = useCustomers();
+  const { customers, deleteCustomer } = useCustomers();
   const money = useCurrency();
   const [search, setSearch] = useState("");
   const [dialog, setDialog] = useState({
@@ -134,6 +135,7 @@ function Customers() {
     customer: null,
   });
   const [historyId, setHistoryId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const query = search.trim().toLowerCase();
   const filtered = customers.filter(
@@ -225,6 +227,15 @@ function Customers() {
                       >
                         <Pencil />
                       </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Delete ${c.name}`}
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => setDeleteTarget(c)}
+                      >
+                        <Trash2 />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -238,6 +249,23 @@ function Customers() {
         open={dialog.open}
         customer={dialog.customer}
         onOpenChange={(open) => setDialog((prev) => ({ ...prev, open }))}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title={`Delete ${deleteTarget?.name}?`}
+        description="This customer will be permanently removed. Customers with existing bookings cannot be deleted."
+        confirmLabel="Delete customer"
+        onConfirm={async () => {
+          try {
+            await deleteCustomer(deleteTarget.id);
+            toast.success(`${deleteTarget.name} deleted`);
+            setDeleteTarget(null);
+          } catch (e) {
+            toast.error(errorMessage(e));
+          }
+        }}
       />
 
       <Sheet open={!!history} onOpenChange={(open) => !open && setHistoryId(null)}>

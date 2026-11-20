@@ -5,7 +5,7 @@ import { useAppData } from "@/components/providers/data-provider";
 
 /** Customers with their booking history and spend, derived from booking records. */
 export function useCustomers() {
-  const { data, loading, error, saveCustomer } = useAppData();
+  const { data, loading, error, saveCustomer, deleteCustomer } = useAppData();
 
   const customers = useMemo(() => {
     if (!data) return [];
@@ -25,5 +25,5 @@ export function useCustomers() {
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [data]);
 
-  return { customers, loading, error, saveCustomer };
+  return { customers, loading, error, saveCustomer, deleteCustomer };
 }

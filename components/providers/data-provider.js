@@ -272,6 +272,16 @@ export function DataProvider({ children }) {
         return copy;
       },
 
+      async deleteCustomer(id) {
+        const bookings = current().bookings.filter((b) => b.customerId === id);
+        if (bookings.length > 0) {
+          throw new Error(
+            `This customer has ${bookings.length} booking(s). Delete or reassign them first.`,
+          );
+        }
+        await drop("customers", id);
+      },
+
       async deleteMenu(id) {
         // Bookings keep their saved price; they just lose the link to the package.
         for (const booking of current().bookings.filter((b) => b.menuId === id)) {

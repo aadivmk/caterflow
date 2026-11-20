@@ -1,11 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { KeyRound, Save, User } from "lucide-react";
+import { Database, KeyRound, Save, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Field } from "@/components/shared/field";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAppData } from "@/components/providers/data-provider";
 import { apiUrl } from "@/lib/api-url";
 import { getSession } from "@/lib/mongodb/session";
 import { errorMessage } from "@/lib/utils";
@@ -243,6 +245,66 @@ function ChangePasswordCard() {
   );
 }
 
+function SampleDataCard() {
+  const { resetDemoData } = useAppData();
+  const [loading, setLoading] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+
+  async function handleLoad() {
+    setLoading(true);
+    try {
+      await resetDemoData();
+      toast.success("Sample data loaded! Check your dashboard.");
+    } catch (e) {
+      toast.error(errorMessage(e));
+    } finally {
+      setLoading(false);
+      setConfirm(false);
+    }
+  }
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Database className="size-5" />
+            </div>
+            <div>
+              <CardTitle>Sample data</CardTitle>
+              <CardDescription>
+                Load demo customers, menu items, menus and bookings to explore
+                the app. This replaces all your current data.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="outline"
+            disabled={loading}
+            onClick={() => setConfirm(true)}
+          >
+            <Database />
+            {loading ? "Loading…" : "Load sample data"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <ConfirmDialog
+        open={confirm}
+        onOpenChange={setConfirm}
+        title="Load sample data?"
+        description="This will delete all your existing customers, menu items, menus, bookings and calculations, then insert a demo dataset. This cannot be undone."
+        confirmLabel="Load sample data"
+        destructive
+        onConfirm={handleLoad}
+      />
+    </>
+  );
+}
+
 export function ProfileForm() {
   const [profile, setProfile] = useState(null);
   const [loadError, setLoadError] = useState(null);
@@ -291,6 +353,7 @@ export function ProfileForm() {
     <div className="space-y-6">
       <AccountInfoCard profile={profile} />
       <ChangePasswordCard />
+      <SampleDataCard />
     </div>
   );
 }
